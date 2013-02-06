@@ -2,8 +2,8 @@ Rail Ticket Service System
 
 Dependency
 ==============================================
-libncurses5
-libncurses5-dev
+gtk3 & gtk3-dev
+packages in Ubuntu is `libgtk-3-0` and `libgtk-3-dev`
 
 Build
 ==============================================
