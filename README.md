@@ -10,7 +10,6 @@ Build
 * `make` to build whole system
 * `make client` to build client
 * `make server` to build server
-* `make run` to start service
 
 Copying
 ==============================================
