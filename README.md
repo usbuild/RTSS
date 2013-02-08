@@ -3,7 +3,7 @@ Rail Ticket Service System
 Dependency
 ==============================================
 gtk3 & gtk3-dev
-packages in Ubuntu is `libgtk-3-0` and `libgtk-3-dev`
+libsqlite3 & libsqlite3-dev
 
 Build
 ==============================================
@@ -13,7 +13,7 @@ Build
 
 Copying
 ==============================================
-The software distributes under BSD license, But *DON'T* use as your homework
+The software distributes under BSD license, But *DON'T* use it as your homework !
 
 Contact
 ==============================================
