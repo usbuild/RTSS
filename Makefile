@@ -19,7 +19,7 @@ all: server
 client:client.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
-server:server.c dbutils.c
+server:server.c dbutils.c user.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
 clean:

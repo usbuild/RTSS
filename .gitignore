@@ -1,5 +1,6 @@
 server
 client
+*.swp
 # Object files
 *.o
 
