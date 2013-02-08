@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
+#include <string.h>
 #include "dbutils.h"
 #include "user.h"
 
@@ -22,6 +23,14 @@ void init() { // init the system
 int main(int argc, const char *argv[])
 {
     init();
-    find_user_by_id("usbuild");
+    /*
+    t_user u;
+    strcpy(u.id, "abc");
+    strcpy(u.password, "abcde");
+    strcpy(u.card, "342622");
+    strcpy(u.phone, "1234567");
+    update_user("abc", &u);
+    */
+    delete_user_by_id("abc");
     return 0;
 }

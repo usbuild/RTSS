@@ -11,9 +11,36 @@ static int callback(void *nouse, int argc, char **argv, char **col_name) {
     strcpy(tmp_user->phone, argv[3]);
     return 0;
 }
-t_user* find_user_by_id(const char* id) {
+
+t_user*
+find_user_by_id(const char* id) {
     char sql[128];
     sprintf(sql, "SELECT * FROM user WHERE id = '%s'", id);
     exec_query(sql, callback);
-    puts(tmp_user->password);
+}
+
+int update_user(const char *id, t_user* data) {
+    tmp_user = NULL; 
+    find_user_by_id(id);
+    char sql[128];
+
+    if(tmp_user == NULL) {
+        sprintf(sql,
+            "INSERT INTO user(`id`, `password`, `card`, `phone`) values('%s', '%s', '%s', '%s')",
+            data->id, data->password, data->card, data->phone);
+    } else {
+        sprintf(sql, 
+            "UPDATE user SET id='%s', password='%s', card='%s', phone='%s' WHERE id='%s'",
+            data->id, data->password, data->card, data->phone, id);
+    }
+    return exec_query(sql, callback);
+}
+
+int
+delete_user_by_id(const char *id) {
+    char sql[128];
+    sprintf(sql, 
+        "DELETE FROM user WHERE id='%s'",
+        id);
+    return exec_query(sql, callback);
 }
