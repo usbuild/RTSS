@@ -14,8 +14,22 @@ void init() { // init the system
 int main(int argc, const char *argv[])
 {
     init();
+    /*
+    t_ticket_list *t = search_tickets("Nan", "");
+    printf("%d\n", t->num);
+    int i = 0;
+    for (i = 0; i < t->num; ++i) {
+        puts(t->data[i].id);
+    }
+    */
+    t_ticket *t = find_ticket_by_id("K8955");
+    t_ticket st;
+    memcpy(&st, t, sizeof(t_ticket));
+    strcpy(st.start, "Shanghai");
+    update_ticket(st.id, &st);
+    /*
     t_ticket tkt;
-    strcpy(tkt.id, "K8955");
+    strcpy(tkt.id, "K8956");
     strcpy(tkt.start, "Nanjing");
     strcpy(tkt.end, "Beijing");
     strcpy(tkt.stime, "2013-02-09 12:00");
@@ -24,5 +38,6 @@ int main(int argc, const char *argv[])
     tkt.distance = 100;
     tkt.num = 500;
     insert_ticket(&tkt);
+    */
     return 0;
 }

@@ -34,6 +34,7 @@ list_callback(void *nouse, int argc, char **argv, char **col_name) {
         tmp_tickets->data = (t_ticket*) realloc(tmp_tickets->data, tmp_tickets->total);
     }
     convert_to_t_ticket(argv, &tmp_tickets->data[tmp_tickets->num++]);
+    return 0;
 }
 
 static int
@@ -41,13 +42,14 @@ callback(void *nouse, int argc, char **argv, char **col_name) {
     if(tmp_ticket != NULL) free(tmp_ticket);
     tmp_ticket = (t_ticket*) malloc(sizeof(t_ticket));
     convert_to_t_ticket(argv, tmp_ticket);
+    return 0;
 }
 
 t_ticket_list *
 search_tickets(const char *s, const char *e) {
     char sql[SQL_LEN];    
     sprintf(sql, 
-        "SELECT * FROM ticket WHERE start like '%%%s%%' and '%%%s%%'",
+        "SELECT * FROM ticket WHERE start like '%%%s%%' and end like '%%%s%%'",
         s, e);
     if(tmp_tickets != NULL) {
         free(tmp_tickets->data);
@@ -108,7 +110,7 @@ int
 delete_ticket_by_id(const char *id) {
     char sql[SQL_LEN];
     sprintf(sql, 
-        "DELETE FROM ticket WHERE id='id'",
+        "DELETE FROM ticket WHERE id='%s'",
         id);
     return exec_query(sql, callback);
 }
