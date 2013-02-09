@@ -1,9 +1,14 @@
-#include "user.h"
+#include <user.h>
+#include <config.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 t_user *tmp_user = NULL;
-static int callback(void *nouse, int argc, char **argv, char **col_name) {
+
+static int
+callback(void *nouse, int argc, char **argv, char **col_name) {
+    if(tmp_user != NULL) free(tmp_user);
     tmp_user = (t_user*) malloc(sizeof(t_user));
     strcpy(tmp_user->id, argv[0]);
     strcpy(tmp_user->password, argv[1]);
@@ -14,31 +19,33 @@ static int callback(void *nouse, int argc, char **argv, char **col_name) {
 
 t_user*
 find_user_by_id(const char* id) {
-    char sql[128];
+    char sql[SQL_LEN];
     sprintf(sql, "SELECT * FROM user WHERE id = '%s'", id);
     exec_query(sql, callback);
+    return tmp_user;
 }
 
-int update_user(const char *id, t_user* data) {
-    tmp_user = NULL; 
-    find_user_by_id(id);
-    char sql[128];
+int 
+insert_user(t_user* data) {
+    char sql[SQL_LEN];
+    sprintf(sql,
+        "INSERT INTO user(`id`, `password`, `card`, `phone`) values('%s', '%s', '%s', '%s')",
+        data->id, data->password, data->card, data->phone);
+    return exec_query(sql, callback);
+}
 
-    if(tmp_user == NULL) {
-        sprintf(sql,
-            "INSERT INTO user(`id`, `password`, `card`, `phone`) values('%s', '%s', '%s', '%s')",
-            data->id, data->password, data->card, data->phone);
-    } else {
-        sprintf(sql, 
-            "UPDATE user SET id='%s', password='%s', card='%s', phone='%s' WHERE id='%s'",
-            data->id, data->password, data->card, data->phone, id);
-    }
+int
+update_user(const char *id, t_user* data) {
+    char sql[SQL_LEN];
+    sprintf(sql, 
+        "UPDATE user SET id='%s', password='%s', card='%s', phone='%s' WHERE id='%s'",
+        data->id, data->password, data->card, data->phone, id);
     return exec_query(sql, callback);
 }
 
 int
 delete_user_by_id(const char *id) {
-    char sql[128];
+    char sql[SQL_LEN];
     sprintf(sql, 
         "DELETE FROM user WHERE id='%s'",
         id);

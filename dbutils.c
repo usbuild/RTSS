@@ -1,7 +1,7 @@
 #include <sqlite3.h>
 #include <stdio.h>
-#include "dbutils.h"
-#include "config.h"
+#include <dbutils.h>
+#include <config.h>
 
 static sqlite3* 
 db_open(const char *dbname) {

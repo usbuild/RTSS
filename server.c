@@ -2,18 +2,9 @@
 #include <stdlib.h>
 #include <sqlite3.h>
 #include <string.h>
-#include "dbutils.h"
-#include "user.h"
-
-static int
-callback(void *nouse, int argc, char **argv, char **col_name) {
-    int i;
-    for (i = 0; i < argc; ++i){
-        printf("%s = %s\n", col_name[i], argv[i] ? argv[i] : "NULL");
-    }
-    printf("\n");
-    return 0;
-}
+#include <dbutils.h>
+#include <user.h>
+#include <ticket.h>
 
 void init() { // init the system
     db_init();
@@ -23,14 +14,15 @@ void init() { // init the system
 int main(int argc, const char *argv[])
 {
     init();
-    /*
-    t_user u;
-    strcpy(u.id, "abc");
-    strcpy(u.password, "abcde");
-    strcpy(u.card, "342622");
-    strcpy(u.phone, "1234567");
-    update_user("abc", &u);
-    */
-    delete_user_by_id("abc");
+    t_ticket tkt;
+    strcpy(tkt.id, "K8955");
+    strcpy(tkt.start, "Nanjing");
+    strcpy(tkt.end, "Beijing");
+    strcpy(tkt.stime, "2013-02-09 12:00");
+    strcpy(tkt.etime, "2013-02-09 20:00");
+    tkt.price = 56.0;
+    tkt.distance = 100;
+    tkt.num = 500;
+    insert_ticket(&tkt);
     return 0;
 }

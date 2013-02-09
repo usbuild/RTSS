@@ -6,7 +6,8 @@ GTK_LIBS=$(shell pkg-config --libs gtk+-3.0)
 SQLITE_INC=$(shell pkg-config --cflags sqlite3)
 SQLITE_LIBS=$(shell pkg-config --libs sqlite3)
 LIBS = -lm
-CFLAGS = -g -Wl,--export-dynamic
+
+CFLAGS = -g -Wl,--export-dynamic -I.
 #CFLAGS += $(GTK_INC)
 CFLAGS += $(SQLITE_INC)
 
@@ -19,7 +20,7 @@ all: server
 client:client.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
-server:server.c dbutils.c user.c
+server:server.c dbutils.c user.c ticket.c utils.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
 clean:
