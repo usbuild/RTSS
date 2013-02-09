@@ -22,11 +22,14 @@ int main(int argc, const char *argv[])
         puts(t->data[i].id);
     }
     */
+    /*
     t_ticket *t = find_ticket_by_id("K8955");
     t_ticket st;
     memcpy(&st, t, sizeof(t_ticket));
     strcpy(st.start, "Shanghai");
     update_ticket(st.id, &st);
+    */
+    add_user_ticket("usbuild", "K8955");
     /*
     t_ticket tkt;
     strcpy(tkt.id, "K8956");

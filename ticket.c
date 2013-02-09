@@ -60,6 +60,43 @@ search_tickets(const char *s, const char *e) {
     return tmp_tickets;
 }
 
+//-----------use user_ticket code table
+t_ticket_list *
+find_tickets_by_user_id(const char *user_id) {
+    char sql[SQL_LEN];
+    sprintf(sql,
+        " SELECT ticket.* FROM user_ticket LEFT JOIN user ON user.id = '%s' AND user_ticket.user_id = user.id "\
+        "LEFT JOIN ticket ON user_ticket.ticket_id = ticket.id" ,
+        user_id);
+    
+    if(tmp_tickets != NULL) {
+        free(tmp_tickets->data);
+        free(tmp_tickets);
+        tmp_tickets = NULL;
+    }
+    exec_query(sql, list_callback);
+    return tmp_tickets;
+}
+
+int 
+add_user_ticket(const char *user_id, const char *ticket_id) {
+    char sql[SQL_LEN];
+    sprintf(sql, 
+        "INSERT INTO user_ticket(`id`, `user_id`, `ticket_id`) VALUES(NULL, '%s', '%s')",
+        user_id, ticket_id
+        );
+    return exec_query(sql, callback);
+}
+int 
+del_user_ticket(const char *user_id, const char *ticket_id) {
+    char sql[SQL_LEN];
+    sprintf(sql,
+        "DELETE FROM user_ticket WHERE user_id='%s' AND ticket_id = '%s'",
+        user_id, ticket_id
+        );
+    return exec_query(sql, callback);
+}
+
 t_ticket *
 find_ticket_by_id(const char *id) {
     char sql[SQL_LEN];
@@ -75,7 +112,7 @@ insert_ticket(t_ticket *tkt) {
     char sql[256];
     sprintf(sql, 
         "INSERT INTO ticket(`id`, `start`, `end`, `stime`, `etime`, `price`, `distance`, `num`)" \
-        " values('%s', '%s', '%s', '%s', '%s', '%lf', '%d', '%d')",
+        " VALUES('%s', '%s', '%s', '%s', '%s', '%lf', '%d', '%d')",
         tkt->id,
         tkt->start,
         tkt->end,

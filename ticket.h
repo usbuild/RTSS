@@ -24,4 +24,8 @@ int insert_ticket(t_ticket *tkt);
 int update_ticket(const char *id, t_ticket *tkt);
 int delete_ticket_by_id(const char *id);
 
+t_ticket_list * find_tickets_by_user_id(const char *user_id);
+int add_user_ticket(const char *user_id, const char *ticket_id);
+int del_user_ticket(const char *user_id, const char *ticket_id);
+
 #endif
