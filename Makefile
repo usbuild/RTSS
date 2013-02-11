@@ -20,7 +20,7 @@ all: server
 client:client.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
-server:server.c dbutils.c user.c ticket.c utils.c
+server:server.c dbutils.c user.c ticket.c utils.c rpc_fifo_server.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
 clean:
