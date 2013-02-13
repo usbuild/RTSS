@@ -8,15 +8,12 @@
 #include <config.h>
 #include <rpc_fifo_server.h>
 
-void init() { // init the system
-    db_init();
-}
-
-
-
 int main(int argc, const char *argv[])
 {
-    init();
-    //start_server(SERVER_FIFO);
+    FILE *f = server_init(SERVER_FIFO);
+    conn_t *t = get_connection(f);
+    if(t != NULL) {
+        printf("%d\n", t->fd);
+    }
     return 0;
 }

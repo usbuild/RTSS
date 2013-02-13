@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <string.h>
 #include <utils.h>
 #include <rpc_fifo_server.h>
@@ -16,7 +17,7 @@ FILE *server_init(const char *path) {
         perror("Create FIFO");
         return NULL;
     }
-    return fopen(path, "r");
+    return fopen(path, "r+");
 }
 
 request_t *
@@ -25,16 +26,16 @@ parse_args(FILE *f) {
     char line[BUF_LEN];
     fgets(line, BUF_LEN, f);
     if(line[0] == '=') {
-        line[strlen(line + 1) - 2] = '\0';
-        rt->argc = atoi(line);
+        line[strlen(line) - 2] = 0;
+        rt->argc = atoi(line + 1);
         rt->argv =  (char**)calloc(rt->argc ,sizeof(char*));
         int i = 0;
         for (i = 0; i < rt->argc; ++i) {
             fgets(line, BUF_LEN, f);
             if(line[0] == '~') {
-                rt->argv[i] = (char*) calloc(ARG_LEN, sizeof(char));
-                line[strlen(line + 1) - 2] = '\0';
-                strlcat(rt->argv[i], line + 1);
+                rt->argv[i] = (char*) calloc(strlen(line), sizeof(char));
+                line[strlen(line) - 2] = 0;
+                strcpy(rt->argv[i], line + 1);
             }
         }
     }
@@ -45,9 +46,12 @@ conn_t *
 get_connection(FILE *f) {
     request_t *t = parse_args(f);
     if(strcmp(t->argv[0], P_CONNECT) == 0) {
-        char *client_fifo_path = strlcat(CLIENT_FIFO, t->argv[1]);
-        conn_t *conn = (conn_t*) sizeof(conn_t);
-        conn->fd = open(client_fifo_path, "rw");
+        char *tmp = strlcat(CLIENT_FIFO, t->argv[1]);
+        char *client_fifo_path = strlcat(tmp, ".fifo");
+        free(tmp);
+
+        conn_t *conn = (conn_t*) malloc(sizeof(conn_t));
+        conn->fd = open(client_fifo_path, O_RDWR);
         return conn;
     }
     return NULL;
