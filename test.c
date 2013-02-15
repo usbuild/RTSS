@@ -9,10 +9,16 @@
 int main(int argc, const char *argv[])
 {
     conn_t *ct = init_client();
-    if(login("usbuild", "12345", ct) == 0) {
+    if(login("abc", "12345", ct) == 0) {
         puts("LOGGED!");
     } else {
         puts("ERROR!");
+    }
+
+    if(buy("K8955", ct) == 0) {
+        puts("BUY!");
+    } else {
+        puts("FAIL!");
     }
 
     release_connection(ct);

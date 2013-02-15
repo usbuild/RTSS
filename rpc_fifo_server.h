@@ -3,12 +3,14 @@
 #include <config.h>
 #include <stdio.h>
 #include <utils.h>
+#include <user.h>
 
 #ifdef LOCAL_VERSION
 typedef struct {
     FILE *input;
     int cfd;        //control fd
     int dfd;        //data fd
+    t_user *user;
 } conn_t;
 #endif
 

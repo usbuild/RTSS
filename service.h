@@ -3,5 +3,7 @@
 #include <rpc_fifo_client.h>
 int login(char *username, char *password, conn_t *conn);
 
+int signup(char *username, char *password, conn_t *conn);
 
+int buy(char *ticketid, conn_t *conn);
 #endif

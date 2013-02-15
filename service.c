@@ -45,12 +45,13 @@ int simple_query(conn_t *conn, char *protocol, int argc, ...) {
 int
 login(char *username, char *password, conn_t *conn) {
     return simple_query(conn, P_LOGIN, 3,username, password);
-    /*
-    request_t *request = new_request(P_LOGIN, 3);
-    request->argv[1] = "usbuild";
-    request->argv[2] = "12345";
-    send_data(conn, request);
-    del_request(request);
-    return query_response(conn);
-    */
+}
+int 
+signup(char *username, char *password, conn_t *conn) {
+    return simple_query(conn, P_SIGNUP, 3, username, password);
+}
+
+int 
+buy(char *ticketid, conn_t *conn) {
+    return simple_query(conn, P_BUY, 2, ticketid);
 }
