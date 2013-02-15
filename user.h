@@ -8,6 +8,7 @@ typedef struct {
 } t_user;
 
 t_user* find_user_by_id(const char* id);
+int insert_user(t_user* data);
 int update_user(const char *id, t_user *data);
 int delete_user_by_id(const char *id);
 #endif
