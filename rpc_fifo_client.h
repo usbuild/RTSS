@@ -5,7 +5,10 @@
 
 #ifdef LOCAL_VERSION
 typedef struct {
-    int fd;
+    int cfd;        //control fd
+    int dfd;        //data fd
+    char *cpath;
+    char *dpath;
 } conn_t;
 #endif
 
@@ -15,5 +18,5 @@ typedef struct {
 
 conn_t *init_client();
 char *build_request_str(request_t *rqst);
-
+void release_connection(conn_t *conn);
 #endif

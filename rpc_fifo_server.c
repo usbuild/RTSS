@@ -47,12 +47,20 @@ get_connection(FILE *f) {
     request_t *t = parse_args(f);
     if(strcmp(t->argv[0], P_CONNECT) == 0) {
         char *tmp = strlcat(CLIENT_FIFO, t->argv[1]);
-        char *client_fifo_path = strlcat(tmp, ".fifo");
+        char *client_fifo_path_c = strlcat(tmp, "_c.fifo");
+        char *client_fifo_path_d = strlcat(tmp, "_d.fifo");
         free(tmp);
 
         conn_t *conn = (conn_t*) malloc(sizeof(conn_t));
-        conn->fd = open(client_fifo_path, O_RDWR);
+        conn->cfd = open(client_fifo_path_c, O_RDONLY);
+        conn->dfd = open(client_fifo_path_d, O_WRONLY);
         return conn;
     }
     return NULL;
+}
+
+void
+release_connection(conn_t *c) {
+    close(c->cfd);
+    close(c->dfd);
 }

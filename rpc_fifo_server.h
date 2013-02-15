@@ -4,7 +4,8 @@
 
 #ifdef LOCAL_VERSION
 typedef struct {
-    int fd;
+    int cfd;        //control fd
+    int dfd;        //data fd
 } conn_t;
 #endif
 

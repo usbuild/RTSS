@@ -23,24 +23,36 @@ conn_t *init_client() {
     free(rqst.argv);
     conn_t *ct = (conn_t*) malloc(sizeof(conn_t));
     char *t = strlcat(CLIENT_FIFO, tmp);
-    char *path = strlcat(t, ".fifo");
+    char *path_c = strlcat(t, "_c.fifo");
+    char *path_d = strlcat(t, "_d.fifo");
+    ct->cpath = path_c;
+    ct->dpath = path_d;
     free(tmp);
     free(t);
-    int rc = mkfifo(path, S_IRUSR | S_IWUSR);
+
+    int rc = mkfifo(path_c, S_IRUSR | S_IWUSR);
     if(rc && errno != EEXIST) {
-        perror("Create FIFO");
+        perror("Create Data FIFO");
         return NULL;
     }
-    ct->fd = open(path, O_RDWR);
-    
+
+    rc = mkfifo(path_d, S_IRUSR | S_IWUSR);
+    if(rc && errno != EEXIST) {
+        perror("Create Command FIFO ");
+        return NULL;
+    }
+
     rc = open(SERVER_FIFO, O_WRONLY);
     if(errno) {
         perror("Connect Server");
         exit(1);
     }
-    puts(path);
+
     write(rc, str, strlen(str));
     free(str);
+
+    ct->cfd = open(path_c, O_WRONLY);
+    ct->dfd= open(path_d, O_RDONLY);
     return ct;
 }
 
@@ -58,4 +70,12 @@ char *build_request_str(request_t *rqst) {
         strcat(str, "\r\n");
     }
     return str;
+}
+
+void
+release_connection(conn_t *conn) {
+    close(conn->cfd);
+    close(conn->dfd);
+    unlink(conn->cpath);
+    unlink(conn->dpath);
 }
