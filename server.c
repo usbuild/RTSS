@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <sys/types.h>
+#include <provider.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <sqlite3.h>
 #include <string.h>
@@ -10,12 +13,17 @@
 
 int main(int argc, const char *argv[])
 {
+    db_init();
     FILE *f = server_init(SERVER_FIFO);
-    conn_t *t = get_connection(f);
-    int i;
-    char a = 'a';
-    for (i = 0; i < 10; ++i) {
-        write(t->dfd, &a, 1, 1);
+    pid_t ppid = getpid();
+    conn_t *client_conn = NULL;
+    while(getpid() == ppid) {
+        if(client_conn != NULL) release_conn(client_conn);
+        client_conn = get_connection(f);
+        fork();
+    }
+    if(client_conn != NULL) {
+        handle_client(client_conn);
     }
     return 0;
 }

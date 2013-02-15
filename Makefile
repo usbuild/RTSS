@@ -17,10 +17,10 @@ LIBS += $(SQLITE_LIBS)
 .PHONY:all clean
 all: server client
 
-client:test.c rpc_fifo_client.c utils.c
+client:test.c rpc_fifo_client.c utils.c service.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
-server:server.c dbutils.c user.c ticket.c utils.c rpc_fifo_server.c
+server:server.c dbutils.c user.c ticket.c utils.c rpc_fifo_server.c provider.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
 clean:

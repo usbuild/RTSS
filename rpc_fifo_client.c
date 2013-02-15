@@ -11,6 +11,22 @@
 #define BUF_LEN 1024
 
 extern int errno;
+
+char *build_request_str(request_t *rqst) {
+    char *str = (char*)malloc(sizeof(char) * 1024);
+    char *tmp = ltoa(rqst->argc);
+    strcpy(str, "=");
+    strcat(str, tmp);
+    strcat(str, "\r\n");
+    free(tmp);
+    int i;
+    for (i = 0; i < rqst->argc; ++i) {
+        strcat(str, "~");
+        strcat(str, rqst->argv[i]);
+        strcat(str, "\r\n");
+    }
+    return str;
+}
 conn_t *init_client() {
     pid_t pid = getpid();
     request_t rqst;
@@ -56,21 +72,6 @@ conn_t *init_client() {
     return ct;
 }
 
-char *build_request_str(request_t *rqst) {
-    char *str = (char*)malloc(sizeof(char) * 1024);
-    char *tmp = ltoa(rqst->argc);
-    strcpy(str, "=");
-    strcat(str, tmp);
-    strcat(str, "\r\n");
-    free(tmp);
-    int i;
-    for (i = 0; i < rqst->argc; ++i) {
-        strcat(str, "~");
-        strcat(str, rqst->argv[i]);
-        strcat(str, "\r\n");
-    }
-    return str;
-}
 
 void
 release_connection(conn_t *conn) {
@@ -78,4 +79,9 @@ release_connection(conn_t *conn) {
     close(conn->dfd);
     unlink(conn->cpath);
     unlink(conn->dpath);
+}
+void send_data(conn_t *conn, request_t *request) {
+    char *str = build_request_str(request);
+    write(conn->cfd, str, strlen(str));
+    free(str);
 }
