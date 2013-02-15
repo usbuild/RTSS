@@ -15,9 +15,9 @@ CFLAGS += $(SQLITE_INC)
 LIBS += $(SQLITE_LIBS)
 
 .PHONY:all clean
-all: server
+all: server client
 
-client:client.c
+client:test.c rpc_fifo_client.c utils.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
 server:server.c dbutils.c user.c ticket.c utils.c rpc_fifo_server.c

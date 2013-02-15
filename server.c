@@ -15,5 +15,10 @@ int main(int argc, const char *argv[])
     if(t != NULL) {
         printf("%d\n", t->fd);
     }
+    int i;
+    char a = 'a';
+    for (i = 0; i < 10; ++i) {
+        write(t->fd, &a, 1, 1);
+    }
     return 0;
 }

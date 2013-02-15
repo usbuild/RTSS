@@ -8,11 +8,6 @@ typedef struct {
 } conn_t;
 #endif
 
-typedef struct {
-    int argc;
-    char **argv;
-} request_t;
-
 #ifdef LOCAL_VERSION
 FILE *server_init(const char *path);
 #endif
