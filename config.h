@@ -5,6 +5,8 @@
 #define SQL_LEN 256
 #define ARG_LEN 128
 
+#define CRLF "\r\n"
+
 #define LOCAL_VERSION
 
 #ifdef LOCAL_VERSION

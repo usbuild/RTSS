@@ -24,4 +24,4 @@ server:server.c dbutils.c user.c ticket.c utils.c rpc_fifo_server.c provider.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
 clean:
-	-rm *.o client server
+	-rm client server

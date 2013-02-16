@@ -8,6 +8,23 @@
 t_ticket_list *tmp_tickets;
 t_ticket *tmp_ticket;
 
+static void 
+clean_tmp_ticket() {
+    if(tmp_ticket != NULL) {
+        free(tmp_ticket);
+        tmp_ticket = NULL;
+    }
+}
+
+static void 
+clean_tmp_tickets() {
+    if(tmp_tickets != NULL) {
+        free(tmp_tickets->data);
+        free(tmp_tickets);
+        tmp_tickets = NULL;
+    }
+}
+
 static void
 convert_to_t_ticket(char **argv, t_ticket *tkt) {
     strcpy(tkt->id, argv[0]);
@@ -39,7 +56,6 @@ list_callback(void *nouse, int argc, char **argv, char **col_name) {
 
 static int
 callback(void *nouse, int argc, char **argv, char **col_name) {
-    if(tmp_ticket != NULL) free(tmp_ticket);
     tmp_ticket = (t_ticket*) malloc(sizeof(t_ticket));
     convert_to_t_ticket(argv, tmp_ticket);
     return 0;
@@ -51,11 +67,7 @@ search_tickets(const char *s, const char *e) {
     sprintf(sql, 
         "SELECT * FROM ticket WHERE start like '%%%s%%' and end like '%%%s%%'",
         s, e);
-    if(tmp_tickets != NULL) {
-        free(tmp_tickets->data);
-        free(tmp_tickets);
-        tmp_tickets = NULL;
-    }
+    clean_tmp_tickets();
     exec_query(sql, list_callback);
     return tmp_tickets;
 }
@@ -68,14 +80,22 @@ find_tickets_by_user_id(const char *user_id) {
         " SELECT ticket.* FROM user_ticket LEFT JOIN user ON user.id = '%s' AND user_ticket.user_id = user.id "\
         "LEFT JOIN ticket ON user_ticket.ticket_id = ticket.id" ,
         user_id);
-    
-    if(tmp_tickets != NULL) {
-        free(tmp_tickets->data);
-        free(tmp_tickets);
-        tmp_tickets = NULL;
-    }
+
+    clean_tmp_tickets();
     exec_query(sql, list_callback);
     return tmp_tickets;
+}
+
+int
+has_user_bought(const char *id, const char *ticket_id) {
+    char sql[SQL_LEN];
+    sprintf(sql, 
+        "SELECT t.* FROM user_ticket ut, ticket t where ut.ticket_id = '%s' and ut.user_id = '%s' and ut.ticket_id = t.id",
+        ticket_id, id);
+    clean_tmp_ticket();
+    exec_query(sql, callback);
+    if(tmp_ticket != NULL) return 1;
+    return 0;
 }
 
 int 
@@ -85,6 +105,7 @@ add_user_ticket(const char *user_id, const char *ticket_id) {
         "INSERT INTO user_ticket(`id`, `user_id`, `ticket_id`) VALUES(NULL, '%s', '%s')",
         user_id, ticket_id
         );
+    clean_tmp_ticket();
     return exec_query(sql, callback);
 }
 int 
@@ -94,8 +115,10 @@ del_user_ticket(const char *user_id, const char *ticket_id) {
         "DELETE FROM user_ticket WHERE user_id='%s' AND ticket_id = '%s'",
         user_id, ticket_id
         );
+    clean_tmp_ticket();
     return exec_query(sql, callback);
 }
+
 
 t_ticket *
 find_ticket_by_id(const char *id) {
@@ -103,6 +126,7 @@ find_ticket_by_id(const char *id) {
     sprintf(sql,
         "SELECT * FROM ticket WHERE id='%s'",
         id);
+    clean_tmp_ticket();
     exec_query(sql, callback);
     return tmp_ticket;
 }
@@ -122,7 +146,7 @@ insert_ticket(t_ticket *tkt) {
         tkt->distance,
         tkt->num
         );
-    puts(sql);
+    clean_tmp_ticket();
     return exec_query(sql, callback);
 }
 
@@ -141,6 +165,7 @@ update_ticket(const char *id, t_ticket *tkt) {
         tkt->num,
         id
         );
+    clean_tmp_ticket();
     return exec_query(sql, callback);
 }
 int
@@ -149,5 +174,7 @@ delete_ticket_by_id(const char *id) {
     sprintf(sql, 
         "DELETE FROM ticket WHERE id='%s'",
         id);
+    clean_tmp_ticket();
     return exec_query(sql, callback);
 }
+

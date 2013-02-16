@@ -26,7 +26,17 @@ exec_query(const char *sql, sqlcallback cbk) {
     }
     return 0;
 }
+void tx_begin() {
+    exec_query("begin;", NULL);
+}
+void tx_commit() {
+    exec_query("commit;", NULL);
+}
+void tx_rollback(){
+    exec_query("rollback;", NULL);
+}
 
 void db_init() {
     rtss_db = db_open(DB_NAME);
 }
+

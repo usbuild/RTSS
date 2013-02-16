@@ -14,11 +14,11 @@ int main(int argc, const char *argv[])
     } else {
         puts("ERROR!");
     }
-
-    if(buy("K8955", ct) == 0) {
-        puts("BUY!");
-    } else {
-        puts("FAIL!");
+    
+    t_ticket_list *list = query_ticket("hai", "jing", ct);
+    int i;
+    for (i = 0; i < list->num; ++i) {
+        puts(list->data[i].id);
     }
 
     release_connection(ct);

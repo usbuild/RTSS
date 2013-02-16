@@ -2,11 +2,12 @@
 #define __RPC_FIFO_CLIENT_H__
 #include <config.h>
 #include <utils.h>
+#include <stdio.h>
 
 #ifdef LOCAL_VERSION
 typedef struct {
     int cfd;        //control fd
-    int dfd;        //data fd
+    FILE *input;
     char *cpath;
     char *dpath;
 } conn_t;

@@ -52,9 +52,8 @@ get_connection(FILE *f) {
         free(tmp);
 
         conn_t *conn = (conn_t*) malloc(sizeof(conn_t));
-        conn->cfd = open(client_fifo_path_c, O_RDONLY);
+        conn->input = fopen(client_fifo_path_c, "r");
         conn->dfd = open(client_fifo_path_d, O_WRONLY);
-        conn->input = fdopen(conn->cfd, "r");
         return conn;
     }
     return NULL;
@@ -63,6 +62,5 @@ get_connection(FILE *f) {
 void
 release_conn(conn_t *c) {
     fclose(c->input);
-    close(c->cfd);
     close(c->dfd);
 }

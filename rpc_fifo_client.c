@@ -68,7 +68,7 @@ conn_t *init_client() {
     free(str);
 
     ct->cfd = open(path_c, O_WRONLY);
-    ct->dfd= open(path_d, O_RDONLY);
+    ct->input = fopen(ct->dpath, "r");
     return ct;
 }
 
@@ -76,7 +76,7 @@ conn_t *init_client() {
 void
 release_connection(conn_t *conn) {
     close(conn->cfd);
-    close(conn->dfd);
+    fclose(conn->input);
     unlink(conn->cpath);
     unlink(conn->dpath);
 }
