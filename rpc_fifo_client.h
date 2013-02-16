@@ -17,7 +17,7 @@ typedef struct {
 
 #endif
 
-conn_t *init_client();
+conn_t *connect_server();
 void release_connection(conn_t *conn);
 void send_data(conn_t *conn, request_t *request);
 #endif

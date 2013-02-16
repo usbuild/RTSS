@@ -6,6 +6,7 @@
 #define ARG_LEN 128
 
 #define CRLF "\r\n"
+#define CLLEN 2
 
 #define LOCAL_VERSION
 

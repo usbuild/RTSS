@@ -1,4 +1,5 @@
 #include <rpc_fifo_client.h>
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <protocol.h>
@@ -17,17 +18,18 @@ char *build_request_str(request_t *rqst) {
     char *tmp = ltoa(rqst->argc);
     strcpy(str, "=");
     strcat(str, tmp);
-    strcat(str, "\r\n");
+    strcat(str, CRLF);
     free(tmp);
     int i;
     for (i = 0; i < rqst->argc; ++i) {
         strcat(str, "~");
         strcat(str, rqst->argv[i]);
-        strcat(str, "\r\n");
+        strcat(str, CRLF);
     }
+    puts(str);
     return str;
 }
-conn_t *init_client() {
+conn_t *connect_server() {
     pid_t pid = getpid();
     request_t rqst;
     rqst.argc = 2;
@@ -58,6 +60,7 @@ conn_t *init_client() {
         return NULL;
     }
 
+    errno = 0;
     rc = open(SERVER_FIFO, O_WRONLY);
     if(errno) {
         perror("Connect Server");

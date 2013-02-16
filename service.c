@@ -75,6 +75,19 @@ query_ticket(char *site1, char *site2, conn_t *conn) {
     return list;
 }
 
+t_user *
+user_info(conn_t *conn) {
+    request_t *rqst = new_request(P_USER_INFO, 1);
+    send_data(conn, rqst);
+    char line[LINE_BUF] = {0};
+    fgets(line, LINE_BUF, conn->input);
+    if(line[0] == '-') return NULL;
+    t_user *user = (t_user*) malloc(sizeof(t_user));
+    fread(user, sizeof(t_user), 1, conn->input);
+    return user;
+}
 
-
-
+int
+update_user(char *passwd, char *card, char *phone, conn_t *conn) {
+    return simple_query(conn, P_USER_UPD, 4, passwd, card, phone);
+}

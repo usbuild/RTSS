@@ -46,6 +46,20 @@ int buy(char *username, char *ticketid) {
     return 0;
 }
 
+int update_user_info(char *id, char *passwd, char *card, char *phone) {
+    t_user user;
+    strcpy(user.id, id);
+    strcpy(user.password, passwd);
+    strcpy(user.card, card);
+    strcpy(user.phone, phone);
+    return update_user(id, &user);
+}
+
+t_user *
+user_info(char *username) {
+    return find_user_by_id(username);
+}
+
 t_ticket_list* 
 query(const char *site1, const char *site2) {
     return search_tickets(site1, site2);
@@ -69,7 +83,7 @@ void handle_client(conn_t *conn) {
             if(IS_PROTOCOL(rqst, P_LOGIN)) {
                 if(login(rqst->argv[1], rqst->argv[2]) == 0) {
                     conn->user = (t_user*) malloc(sizeof(t_user));
-                    memcpy(conn->user, find_user_by_id(rqst->argv[1]), sizeof(conn->user));
+                    memcpy(conn->user, find_user_by_id(rqst->argv[1]), sizeof(t_user));
                     simple_response(0, conn);
                 } else {
                     simple_response(1, conn);
@@ -92,24 +106,36 @@ void handle_client(conn_t *conn) {
                     t_ticket_list *list = query(rqst->argv[1], rqst->argv[2]);
                     write(conn->dfd, "*", 1);
 
-                    int crlen = strlen(CRLF);
                     char *tmp = ltoa(list->num);
 
                     int tmplen = strlen(tmp);
                     write(conn->dfd, tmp, tmplen);
-                    write(conn->dfd, CRLF, crlen);
+                    write(conn->dfd, CRLF, CLLEN);
 
                     free(tmp);
 
                     tmp = ltoa(sizeof(t_ticket));
                     tmplen = strlen(tmp);
-
                     int i;
                     for (i = 0; i < list->num; ++i) {
-                        write(conn->dfd, "?", 1); write(conn->dfd, tmp, tmplen); write(conn->dfd, CRLF, crlen);
+                        write(conn->dfd, "?", 1); write(conn->dfd, tmp, tmplen); write(conn->dfd, CRLF, CLLEN);
                         write(conn->dfd, &list->data[i], sizeof(t_ticket));
                     }
                     free(tmp);
+                } else if(IS_PROTOCOL(rqst, P_USER_INFO)) {
+
+                    char *tmp = ltoa(sizeof(t_user));
+                    int tmplen = strlen(tmp);
+                    write(conn->dfd, "?", 1); write(conn->dfd, tmp, tmplen); write(conn->dfd, CRLF, CLLEN);
+                    write(conn->dfd, conn->user, sizeof(t_user));
+                } else if(IS_PROTOCOL(rqst, P_USER_UPD)) {
+
+                    if(update_user_info(conn->user->id, rqst->argv[1], rqst->argv[2], rqst->argv[3]) == 0)  {
+                        simple_response(0, conn);
+                    } else {
+                        simple_response(1, conn);
+                    }
+
                 }
 
             } else {

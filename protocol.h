@@ -5,6 +5,8 @@
 #define P_LOGIN         "login"
 #define P_SIGNUP        "signup"
 #define P_QUERY         "query"
+#define P_USER_INFO     "user_info"
+#define P_USER_UPD      "user_update"
 #define P_ADD_TICKET    "add_ticket"
 #define P_DEL_TICKET    "del_ticket"
 #endif

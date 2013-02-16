@@ -12,7 +12,7 @@
 
 extern int errno;
 FILE *server_init(const char *path) {
-    int rc = mkfifo(path, S_IRUSR| S_IWUSR);
+    int rc = mkfifo(path, S_IRUSR | S_IWUSR | S_IWGRP | S_IRGRP);
     if(rc && errno != EEXIST) {
         perror("Create FIFO");
         return NULL;
