@@ -74,7 +74,7 @@ N_CALLBACK(on_login_win_show) {
 }
 
 void reset_user_info() {
-    //if(user != NULL) free(user);
+    if(user != NULL) free(user);
     user = user_info(conn);
     gtk_label_set_text(lbl_username, user->id);
     gtk_label_set_text(lbl_card, user->card);
@@ -90,7 +90,7 @@ void reset_user_info() {
 N_CALLBACK(on_main_win_show) {
     //for test
     conn = connect_server();    
-    login("abc", "12345", conn);
+    login("abc", "abc", conn);
     reset_user_info();
 }
 
@@ -109,14 +109,13 @@ N_CALLBACK(on_save_info_btn_clicked) {
     char *phone = (char*)gtk_entry_get_text(et_phone);
     if(strcmp(passwd, repasswd) != 0) {
         GtkMessageDialog* dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
-                main_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Wrong username or password!"
+                main_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"password not match"
                 ));
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(GTK_WIDGET(dialog));
         return;
     }
     if(update_user(passwd, card, phone, conn) == 0)  {
-
        reset_user_info(); 
     } else {
         GtkMessageDialog* dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(

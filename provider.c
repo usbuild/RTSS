@@ -128,9 +128,10 @@ void handle_client(conn_t *conn) {
                     int tmplen = strlen(tmp);
                     write(conn->dfd, "?", 1); write(conn->dfd, tmp, tmplen); write(conn->dfd, CRLF, CLLEN);
                     write(conn->dfd, conn->user, sizeof(t_user));
-                } else if(IS_PROTOCOL(rqst, P_USER_UPD)) {
 
+                } else if(IS_PROTOCOL(rqst, P_USER_UPD)) {
                     if(update_user_info(conn->user->id, rqst->argv[1], rqst->argv[2], rqst->argv[3]) == 0)  {
+                        memcpy(conn->user, find_user_by_id(conn->user->id), sizeof(t_user));
                         simple_response(0, conn);
                     } else {
                         simple_response(1, conn);

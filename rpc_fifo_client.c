@@ -14,12 +14,14 @@
 extern int errno;
 
 char *build_request_str(request_t *rqst) {
-    char *str = (char*)malloc(sizeof(char) * 1024);
+    char *str = (char*) malloc(sizeof(char) * 1024);
+
     char *tmp = ltoa(rqst->argc);
     strcpy(str, "=");
     strcat(str, tmp);
     strcat(str, CRLF);
     free(tmp);
+
     int i;
     for (i = 0; i < rqst->argc; ++i) {
         strcat(str, "~");
