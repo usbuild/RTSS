@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkListStore" id="buy_store">
+    <columns>
+      <!-- column-name id -->
+      <column type="gchararray"/>
+      <!-- column-name start -->
+      <column type="gchararray"/>
+      <!-- column-name end -->
+      <column type="gchararray"/>
+      <!-- column-name stime -->
+      <column type="gchararray"/>
+      <!-- column-name etime -->
+      <column type="gchararray"/>
+      <!-- column-name price -->
+      <column type="gdouble"/>
+      <!-- column-name distance -->
+      <column type="gint"/>
+      <!-- column-name num -->
+      <column type="gint"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="login_win">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">用户登录</property>
@@ -69,6 +89,20 @@
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="signup_btn">
+                <property name="label" translatable="yes">注册</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_signup_btn_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
@@ -704,26 +738,6 @@
     </child>
   </object>
   <object class="GtkListStore" id="search_result_store">
-    <columns>
-      <!-- column-name id -->
-      <column type="gchararray"/>
-      <!-- column-name start -->
-      <column type="gchararray"/>
-      <!-- column-name end -->
-      <column type="gchararray"/>
-      <!-- column-name stime -->
-      <column type="gchararray"/>
-      <!-- column-name etime -->
-      <column type="gchararray"/>
-      <!-- column-name price -->
-      <column type="gdouble"/>
-      <!-- column-name distance -->
-      <column type="gint"/>
-      <!-- column-name num -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="buy_store">
     <columns>
       <!-- column-name id -->
       <column type="gchararray"/>

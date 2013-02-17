@@ -16,6 +16,7 @@ t_user *user = NULL;
 GtkWindow *login_win;
 GtkButton *login_btn;
 GtkButton *cancel_btn;
+GtkButton *signup_btn;
 GtkWindow *main_win;
 GtkEntry *l_username;
 GtkEntry *l_password;
@@ -115,6 +116,23 @@ N_CALLBACK(on_login_btn_clicked){
     }
 }
 
+N_CALLBACK(on_signup_btn_clicked) {
+    if(signup((char*)gtk_entry_get_text(l_username), (char*)gtk_entry_get_text(l_password), conn) == 0) {
+        GtkMessageDialog* dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                login_win,GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_CLOSE,"Signup successfully! Please Press login button to login"
+                ));
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+    } else {
+        GtkMessageDialog* dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                login_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Signup Failed!"
+                ));
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+    }
+
+}
+
 N_CALLBACK(on_login_win_destroy) {
     gtk_main_quit();
 }
@@ -124,7 +142,7 @@ N_CALLBACK(on_main_win_destroy) {
 }
 
 N_CALLBACK(on_login_win_show) {
-    //conn = connect_server();    
+    conn = connect_server();    
 }
 
 void reset_user_info() {/*{{{*/
@@ -166,8 +184,8 @@ update_buy_table() {
 
 N_CALLBACK(on_main_win_show) {
     //for test
-    conn = connect_server();    
-    login("abc", "abc", conn);
+    //conn = connect_server();    
+    //login("abc", "abc", conn);
     reset_user_info();
     setup_tree_view(GTK_WIDGET(ticket_table));
     setup_tree_view(GTK_WIDGET(buy_ticket_table));
@@ -323,10 +341,10 @@ int main(int argc, char *argv[])
     get_widgets(gb);
 
 
-    //gtk_widget_show(GTK_WIDGET(login_win));
+    gtk_widget_show(GTK_WIDGET(login_win));
 
 
-    gtk_widget_show(GTK_WIDGET(main_win));
+    //gtk_widget_show(GTK_WIDGET(main_win));
 
     gtk_main();
     return 0;
