@@ -670,11 +670,19 @@
           </packing>
         </child>
         <child>
-          <object class="GtkTreeView" id="treeview3">
+          <object class="GtkScrolledWindow" id="scrolledwindow2">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <child internal-child="selection">
-              <object class="GtkTreeSelection" id="treeview-selection3"/>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTreeView" id="buy_ticket_table">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <signal name="row-activated" handler="on_buy_ticket_table_row_activated" swapped="no"/>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection" id="treeview-selection2"/>
+                </child>
+              </object>
             </child>
           </object>
           <packing>
@@ -696,6 +704,26 @@
     </child>
   </object>
   <object class="GtkListStore" id="search_result_store">
+    <columns>
+      <!-- column-name id -->
+      <column type="gchararray"/>
+      <!-- column-name start -->
+      <column type="gchararray"/>
+      <!-- column-name end -->
+      <column type="gchararray"/>
+      <!-- column-name stime -->
+      <column type="gchararray"/>
+      <!-- column-name etime -->
+      <column type="gchararray"/>
+      <!-- column-name price -->
+      <column type="gdouble"/>
+      <!-- column-name distance -->
+      <column type="gint"/>
+      <!-- column-name num -->
+      <column type="gint"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="buy_store">
     <columns>
       <!-- column-name id -->
       <column type="gchararray"/>

@@ -35,4 +35,5 @@ t_user *user_info(conn_t *conn);
 t_ticket_list * query_ticket(char *site1, char *site2, conn_t *conn);
 
 int update_user(char *passwd, char *card, char *phone, conn_t *conn);
+t_ticket_list  *query_buy_ticket(conn_t *conn);
 #endif

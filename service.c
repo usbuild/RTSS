@@ -80,6 +80,26 @@ query_ticket(char *site1, char *site2, conn_t *conn) {
     return list;
 }
 
+t_ticket_list *
+query_buy_ticket(conn_t *conn) {
+    request_t *rqst = new_request(P_QUERY_BUY, 1);
+    send_data(conn, rqst);
+    del_request(rqst);
+
+    char line[LINE_BUF] = {0};
+    fgets(line, LINE_BUF, conn->input);
+    t_ticket_list *list = (t_ticket_list*) malloc(sizeof(t_ticket_list));
+    line[strlen(line) - 2] = 0;
+    list->num = atoi(line + 1);
+    list->data = (t_ticket *) calloc(list->num, sizeof(t_ticket));
+    int i;
+    for (i = 0; i < list->num; ++i) {
+        fgets(line, LINE_BUF, conn->input);
+        fread(&list->data[i], sizeof(t_ticket), 1, conn->input);
+    }
+    return list;
+}
+
 t_user *
 user_info(conn_t *conn) {
     request_t *rqst = new_request(P_USER_INFO, 1);
@@ -96,4 +116,9 @@ user_info(conn_t *conn) {
 int
 update_user(char *passwd, char *card, char *phone, conn_t *conn) {
     return simple_query(conn, P_USER_UPD, 4, passwd, card, phone);
+}
+
+int 
+refund(char *id, conn_t *conn) {
+    return simple_query(conn, P_REFUND, 2, id);
 }

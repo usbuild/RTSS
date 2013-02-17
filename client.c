@@ -31,8 +31,10 @@ GtkEntry *et_card;
 GtkEntry *et_phone;
 GtkTreeView *ticket_table;
 GtkListStore *search_result_store;
+GtkListStore *buy_store;
 GtkEntry *et_start;
 GtkEntry *et_end;
+GtkTreeView *buy_ticket_table;
 
 void get_widgets(GtkBuilder* gb)
 {
@@ -54,11 +56,12 @@ void get_widgets(GtkBuilder* gb)
     W_G(gb, LIST_STORE, search_result_store);
     W_G(gb, ENTRY, et_start);
     W_G(gb, ENTRY, et_end);
+    W_G(gb, TREE_VIEW, buy_ticket_table);
+    W_G(gb, LIST_STORE, buy_store);
 }
 
 static void
 format_double(GtkTreeViewColumn *tree_column, GtkCellRenderer *cell, GtkTreeModel *tree_model, GtkTreeIter *iter, gpointer data) {
-
     double price;
     char buf[10];
     gtk_tree_model_get(tree_model, iter, 5, &price, -1);
@@ -67,7 +70,7 @@ format_double(GtkTreeViewColumn *tree_column, GtkCellRenderer *cell, GtkTreeMode
 
 }
 static void
-setup_tree_view(GtkWidget *treeview) {
+setup_tree_view(GtkWidget *treeview) {/*{{{*/
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
 
@@ -97,7 +100,7 @@ setup_tree_view(GtkWidget *treeview) {
 
     column = gtk_tree_view_column_new_with_attributes("Num", renderer, "text", 7, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-}
+}/*}}}*/
 
 N_CALLBACK(on_login_btn_clicked){
     if(login((char*)gtk_entry_get_text(l_username), (char*)gtk_entry_get_text(l_password), conn) == 0) {
@@ -137,12 +140,38 @@ void reset_user_info() {/*{{{*/
     gtk_entry_set_text(et_phone, user->phone);
 }/*}}}*/
 
+
+static void
+update_buy_table() {
+    t_ticket_list *list = query_buy_ticket(conn);
+
+    GtkTreeIter iter;
+    gtk_list_store_clear(buy_store);
+    int i;
+    for (i = 0; i < list->num; i++) {
+        gtk_list_store_append(buy_store, &iter);
+        gtk_list_store_set(buy_store, &iter,
+            0, list->data[i].id,
+            1, list->data[i].start,
+            2, list->data[i].end,
+            3, list->data[i].stime,
+            4, list->data[i].etime,
+            5, list->data[i].price,
+            6, list->data[i].distance,
+            7, list->data[i].num,
+            -1);
+    }
+    gtk_tree_view_set_model(GTK_TREE_VIEW(buy_ticket_table), GTK_TREE_MODEL(buy_store));
+}
+
 N_CALLBACK(on_main_win_show) {
     //for test
     conn = connect_server();    
     login("abc", "abc", conn);
     reset_user_info();
     setup_tree_view(GTK_WIDGET(ticket_table));
+    setup_tree_view(GTK_WIDGET(buy_ticket_table));
+    update_buy_table();
 }
 
 
@@ -189,9 +218,9 @@ gboolean on_main_win_delete_event(GtkWindow *window, gpointer user_data) {
     return TRUE;
 }/*}}}*/
 
-N_CALLBACK(on_search_btn_clicked) {/*{{{*/
+static void 
+update_search_result() {
     t_ticket_list *list = query_ticket((char*)gtk_entry_get_text(et_start), (char*)gtk_entry_get_text(et_end), conn);
-
     GtkTreeIter iter;
     gtk_list_store_clear(search_result_store);
     int i;
@@ -209,7 +238,11 @@ N_CALLBACK(on_search_btn_clicked) {/*{{{*/
             -1);
     }
     gtk_tree_view_set_model(GTK_TREE_VIEW(ticket_table), GTK_TREE_MODEL(search_result_store));
+}
+N_CALLBACK(on_search_btn_clicked) {/*{{{*/
+    update_search_result();
 }/*}}}*/
+
 
 void on_ticket_table_row_activated( GtkTreeView *treeview,
                                     GtkTreePath *path,
@@ -222,6 +255,8 @@ void on_ticket_table_row_activated( GtkTreeView *treeview,
         gtk_tree_model_get(model, &iter, 0, &id, -1);
         GtkMessageDialog *dialog;
         if(buy(id, conn) == 0) {
+            update_buy_table();
+            update_search_result();
             dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
                     login_win,GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_CLOSE,"Buy ticket successfully"
                     ));
@@ -237,8 +272,37 @@ void on_ticket_table_row_activated( GtkTreeView *treeview,
     }
 }
 
+void on_buy_ticket_table_row_activated( GtkTreeView *treeview,
+                                    GtkTreePath *path,
+                                    GtkTreeViewColumn *col,
+                                    gpointer userdata) {
+    GtkTreeIter iter;
+    GtkTreeModel *model = gtk_tree_view_get_model(treeview);
+    gchar *id;
+    if(gtk_tree_model_get_iter(model, &iter, path)) {
+        gtk_tree_model_get(model, &iter, 0, &id, -1);
+        GtkMessageDialog *dialog;
+        if(refund(id, conn) == 0) {
+            update_buy_table();
+            update_search_result();
+            dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                    login_win,GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_CLOSE,"Refund successfully"
+                    ));
+        } else {
+            dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                    login_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Refund Failed"
+                    ));
+            
+        }
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+        g_free(id);
+    }
+    
+}
 
-GtkBuilder* gtk_load_glade(gchar* filename) {
+
+GtkBuilder* gtk_load_glade(gchar* filename) {/*{{{*/
     GtkBuilder *gb;
     gb = gtk_builder_new();
     if(!gtk_builder_add_from_file(gb, filename, NULL)) {
@@ -266,4 +330,4 @@ int main(int argc, char *argv[])
 
     gtk_main();
     return 0;
-}
+}/*}}}*/
