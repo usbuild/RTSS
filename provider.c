@@ -103,11 +103,11 @@ void handle_client(conn_t *conn) {
                         simple_response(1, conn);
                     }
                 } else if(IS_PROTOCOL(rqst, P_QUERY)) {
+
                     t_ticket_list *list = query(rqst->argv[1], rqst->argv[2]);
+
                     write(conn->dfd, "*", 1);
-
                     char *tmp = ltoa(list->num);
-
                     int tmplen = strlen(tmp);
                     write(conn->dfd, tmp, tmplen);
                     write(conn->dfd, CRLF, CLLEN);

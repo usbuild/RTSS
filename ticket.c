@@ -5,7 +5,7 @@
 #include <config.h>
 #define DEFAULT_LIST_SIZE 10
 
-t_ticket_list *tmp_tickets;
+t_ticket_list *tmp_tickets = NULL;
 t_ticket *tmp_ticket;
 
 static void 
@@ -19,10 +19,15 @@ clean_tmp_ticket() {
 static void 
 clean_tmp_tickets() {
     if(tmp_tickets != NULL) {
-        free(tmp_tickets->data);
-        free(tmp_tickets);
-        tmp_tickets = NULL;
+        if (tmp_tickets->data != NULL) {
+            free(tmp_tickets->data);
+        }
+    } else {
+        tmp_tickets = (t_ticket_list*) malloc(sizeof(t_ticket_list));
     }
+    tmp_tickets->data = NULL;
+    tmp_tickets->num = 0;
+    tmp_tickets->total = 0;
 }
 
 static void
@@ -39,9 +44,6 @@ convert_to_t_ticket(char **argv, t_ticket *tkt) {
 
 static int
 list_callback(void *nouse, int argc, char **argv, char **col_name) {
-    if(tmp_tickets == NULL) {
-        tmp_tickets = (t_ticket_list*) calloc( sizeof(t_ticket_list), 1);
-    }
     if(tmp_tickets->num == 0) {
         tmp_tickets->total = DEFAULT_LIST_SIZE;
         tmp_tickets->data = (t_ticket*) calloc(sizeof(t_ticket), tmp_tickets->total);

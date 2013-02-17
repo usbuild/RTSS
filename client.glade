@@ -572,7 +572,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry7">
+                  <object class="GtkEntry" id="et_start">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
@@ -596,7 +596,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry8">
+                  <object class="GtkEntry" id="et_end">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
@@ -613,6 +613,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_search_btn_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -628,13 +629,22 @@
               </packing>
             </child>
             <child>
-              <object class="GtkTreeView" id="treeview2">
+              <object class="GtkScrolledWindow" id="scrolledwindow1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="model">search_result_store</property>
-                <property name="enable_grid_lines">horizontal</property>
-                <child internal-child="selection">
-                  <object class="GtkTreeSelection" id="treeview-selection2"/>
+                <property name="shadow_type">in</property>
+                <child>
+                  <object class="GtkTreeView" id="ticket_table">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="model">search_result_store</property>
+                    <property name="search_column">0</property>
+                    <property name="enable_grid_lines">horizontal</property>
+                    <signal name="row-activated" handler="on_ticket_table_row_activated" swapped="no"/>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection" id="treeview-selection"/>
+                    </child>
+                  </object>
                 </child>
               </object>
               <packing>
@@ -687,19 +697,22 @@
   </object>
   <object class="GtkListStore" id="search_result_store">
     <columns>
-      <!-- column-name line_id -->
+      <!-- column-name id -->
       <column type="gchararray"/>
       <!-- column-name start -->
       <column type="gchararray"/>
       <!-- column-name end -->
       <column type="gchararray"/>
+      <!-- column-name stime -->
+      <column type="gchararray"/>
+      <!-- column-name etime -->
+      <column type="gchararray"/>
+      <!-- column-name price -->
+      <column type="gdouble"/>
+      <!-- column-name distance -->
+      <column type="gint"/>
+      <!-- column-name num -->
+      <column type="gint"/>
     </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">你好</col>
-        <col id="1" translatable="yes">世界</col>
-        <col id="2" translatable="yes">OK</col>
-      </row>
-    </data>
   </object>
 </interface>

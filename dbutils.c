@@ -17,6 +17,7 @@ db_open(const char *dbname) {
 
 int
 exec_query(const char *sql, sqlcallback cbk) {
+    puts(sql);
     char *err_msg;
     int rc = sqlite3_exec(rtss_db, sql, cbk, 0, &err_msg);
     if(rc != SQLITE_OK) {
