@@ -21,6 +21,7 @@ callback(void *nouse, int argc, char **argv, char **col_name) {
     strcpy(tmp_user->password, argv[1]);
     strcpy(tmp_user->card, argv[2]);
     strcpy(tmp_user->phone, argv[3]);
+    tmp_user->type = atoi(argv[4]);
     return 0;
 }
 

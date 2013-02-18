@@ -6,7 +6,7 @@
 #include <service.h>
 #include <rpc_fifo_client.h>
 
-#define W_G(builder,type,name) name=GTK_##type(gtk_builder_get_object(builder,#name))
+#define W_G(type,name) name=GTK_##type(gtk_builder_get_object(gb,#name))
 #define N_CALLBACK(event_name) void event_name(GtkWidget *widget, gpointer user_data)
 
 conn_t *conn;
@@ -18,6 +18,7 @@ GtkButton *login_btn;
 GtkButton *cancel_btn;
 GtkButton *signup_btn;
 GtkWindow *main_win;
+GtkWindow *admin_win;
 GtkEntry *l_username;
 GtkEntry *l_password;
 
@@ -37,28 +38,51 @@ GtkEntry *et_start;
 GtkEntry *et_end;
 GtkTreeView *buy_ticket_table;
 
+
+GtkEntry *et_tkt_id;
+GtkEntry *et_tkt_start;
+GtkEntry *et_tkt_end;
+GtkEntry *et_tkt_stime;
+GtkEntry *et_tkt_etime;
+GtkEntry *et_tkt_distance;
+GtkEntry *et_tkt_price;
+GtkEntry *et_tkt_num;
+GtkTreeView *station_table;
+GtkListStore *station_store;
+
 void get_widgets(GtkBuilder* gb)
 {
-    W_G(gb, WINDOW, login_win);
-    W_G(gb, BUTTON, login_btn);
-    W_G(gb, BUTTON, cancel_btn);
-    W_G(gb, WINDOW, main_win);
-    W_G(gb, ENTRY, l_username);
-    W_G(gb, ENTRY, l_password);
-    W_G(gb, LABEL, lbl_username);
-    W_G(gb, LABEL, lbl_password);
-    W_G(gb, LABEL, lbl_card);
-    W_G(gb, LABEL, lbl_phone);
-    W_G(gb, ENTRY, et_password);
-    W_G(gb, ENTRY, et_repassword);
-    W_G(gb, ENTRY, et_card);
-    W_G(gb, ENTRY, et_phone);
-    W_G(gb, TREE_VIEW, ticket_table);
-    W_G(gb, LIST_STORE, search_result_store);
-    W_G(gb, ENTRY, et_start);
-    W_G(gb, ENTRY, et_end);
-    W_G(gb, TREE_VIEW, buy_ticket_table);
-    W_G(gb, LIST_STORE, buy_store);
+    W_G(WINDOW, login_win);
+    W_G(BUTTON, login_btn);
+    W_G(BUTTON, cancel_btn);
+    W_G(WINDOW, main_win);
+    W_G(ENTRY, l_username);
+    W_G(ENTRY, l_password);
+    W_G(LABEL, lbl_username);
+    W_G(LABEL, lbl_password);
+    W_G(LABEL, lbl_card);
+    W_G(LABEL, lbl_phone);
+    W_G(ENTRY, et_password);
+    W_G(ENTRY, et_repassword);
+    W_G(ENTRY, et_card);
+    W_G(ENTRY, et_phone);
+    W_G(TREE_VIEW, ticket_table);
+    W_G(LIST_STORE, search_result_store);
+    W_G(ENTRY, et_start);
+    W_G(ENTRY, et_end);
+    W_G(TREE_VIEW, buy_ticket_table);
+    W_G(LIST_STORE, buy_store);
+    W_G(WINDOW, admin_win);
+    W_G(ENTRY, et_tkt_id);
+    W_G(ENTRY, et_tkt_start);
+    W_G(ENTRY, et_tkt_end);
+    W_G(ENTRY, et_tkt_stime);
+    W_G(ENTRY, et_tkt_etime);
+    W_G(ENTRY, et_tkt_price);
+    W_G(ENTRY, et_tkt_distance);
+    W_G(ENTRY, et_tkt_num);
+    W_G(TREE_VIEW, station_table);
+    W_G(LIST_STORE, station_store);
 }
 
 static void
@@ -105,8 +129,13 @@ setup_tree_view(GtkWidget *treeview) {/*{{{*/
 
 N_CALLBACK(on_login_btn_clicked){
     if(login((char*)gtk_entry_get_text(l_username), (char*)gtk_entry_get_text(l_password), conn) == 0) {
+        user = user_info(conn);
         gtk_widget_hide(GTK_WIDGET(login_win));
-        gtk_widget_show(GTK_WIDGET(main_win));
+        if(user->type) {
+            gtk_widget_show(GTK_WIDGET(admin_win));
+        } else {
+            gtk_widget_show(GTK_WIDGET(main_win));
+        }
     } else {
         GtkMessageDialog* dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
                 login_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Wrong username or password!"
@@ -139,11 +168,25 @@ N_CALLBACK(on_login_win_destroy) {
 
 N_CALLBACK(on_main_win_destroy) {
     gtk_main_quit();
+} N_CALLBACK(on_admin_win_destroy) {
+    gtk_main_quit();
 }
 
 N_CALLBACK(on_login_win_show) {
     conn = connect_server();    
 }
+
+N_CALLBACK(on_admin_win_show) {
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("ID", renderer, "text", 0, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(station_table), column);
+
+    column = gtk_tree_view_column_new_with_attributes("name", renderer, "text", 1, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(station_table), column);
+}
+
 
 void reset_user_info() {/*{{{*/
     if(user != NULL) free(user);
@@ -224,6 +267,18 @@ N_CALLBACK(on_save_info_btn_clicked) {/*{{{*/
     }
 }
 
+gboolean on_admin_win_delete_event(GtkWindow *window, gpointer user_data) {
+    GtkMessageDialog* dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+            main_win,GTK_DIALOG_MODAL,GTK_MESSAGE_QUESTION,GTK_BUTTONS_YES_NO,"Are you sure to quit?"
+            ));
+    gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+    if(result == GTK_RESPONSE_YES) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 gboolean on_main_win_delete_event(GtkWindow *window, gpointer user_data) {
     GtkMessageDialog* dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
             main_win,GTK_DIALOG_MODAL,GTK_MESSAGE_QUESTION,GTK_BUTTONS_YES_NO,"Are you sure to quit?"
@@ -290,7 +345,7 @@ void on_ticket_table_row_activated( GtkTreeView *treeview,
     }
 }
 
-void on_buy_ticket_table_row_activated( GtkTreeView *treeview,
+void on_buy_ticket_table_row_activated( GtkTreeView *treeview,/*{{{*/
                                     GtkTreePath *path,
                                     GtkTreeViewColumn *col,
                                     gpointer userdata) {
@@ -317,8 +372,69 @@ void on_buy_ticket_table_row_activated( GtkTreeView *treeview,
         g_free(id);
     }
     
+}/*}}}*/
+
+//admin win
+char old_tkt_id[10]={0};
+N_CALLBACK(on_load_tkt_btn_clicked) {
+    t_ticket *tkt = load_ticket((char*)gtk_entry_get_text(et_tkt_id), conn);
+    if(tkt == NULL) {
+        GtkMessageDialog *dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                admin_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"No Ticket Found"
+                ));
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+        strcpy(old_tkt_id, "");
+    } else {
+        strcpy(old_tkt_id, tkt->id);
+        char tmp[10];
+        gtk_entry_set_text(et_tkt_id, tkt->id);        
+        sprintf(tmp, "%d", tkt->start_id);
+        gtk_entry_set_text(et_tkt_start, tmp);        
+        sprintf(tmp, "%d", tkt->end_id);
+        gtk_entry_set_text(et_tkt_end, tmp);        
+        gtk_entry_set_text(et_tkt_stime, tkt->stime);        
+        gtk_entry_set_text(et_tkt_etime, tkt->etime);        
+
+        sprintf(tmp, "%2.lf", tkt->price);
+        gtk_entry_set_text(et_tkt_price, tmp);        
+
+        sprintf(tmp, "%d", tkt->distance);
+        gtk_entry_set_text(et_tkt_distance, tmp);        
+
+        sprintf(tmp, "%d", tkt->num);
+        gtk_entry_set_text(et_tkt_num, tmp);        
+        free(tkt);
+    }
 }
 
+N_CALLBACK(on_save_tkt_btn_clicked) {
+    GtkMessageDialog *dialog;
+    if( update_tkt(
+            old_tkt_id,
+            (char*)gtk_entry_get_text(et_tkt_id),
+            (char*)gtk_entry_get_text(et_tkt_start),
+            (char*)gtk_entry_get_text(et_tkt_end),
+            (char*)gtk_entry_get_text(et_tkt_stime),
+            (char*)gtk_entry_get_text(et_tkt_etime),
+            (char*)gtk_entry_get_text(et_tkt_price),
+            (char*)gtk_entry_get_text(et_tkt_distance),
+            (char*)gtk_entry_get_text(et_tkt_num),
+            conn
+            ) == 0)  {
+        dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                admin_win,GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_CLOSE,"Save successfully"
+                ));
+
+    } else {
+        dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                admin_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Save Failed"
+                ));
+
+    }
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+}
 
 GtkBuilder* gtk_load_glade(gchar* filename) {/*{{{*/
     GtkBuilder *gb;

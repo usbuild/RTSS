@@ -11,4 +11,7 @@
 #define P_USER_UPD      "user_upd"
 #define P_ADD_TICKET    "add_ticket"
 #define P_DEL_TICKET    "del_ticket"
+#define P_TICKET        "load_ticket"
+#define P_TKT_UPDATE    "update_ticket"
+#define P_EXIT          "exit"
 #endif

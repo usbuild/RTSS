@@ -6,8 +6,7 @@
 #include <rpc_fifo_client.h>
 #include <stdarg.h>
 #define LINE_BUF 1024
-request_t *
-new_request(char *protocol, int argc) {
+request_t * new_request(char *protocol, int argc) {
     request_t *rqst;
     rqst = (request_t*) malloc(sizeof(request_t));
     rqst->argv = (char**) malloc(sizeof(char*) * argc);
@@ -100,6 +99,23 @@ query_buy_ticket(conn_t *conn) {
     return list;
 }
 
+t_ticket *
+load_ticket(char *id, conn_t *conn) {
+    request_t *rqst = new_request(P_TICKET, 2);
+    rqst->argv[1] = id;
+    send_data(conn, rqst);
+    del_request(rqst);
+
+    char line[LINE_BUF] = {0};
+    fgets(line, LINE_BUF, conn->input);
+    t_ticket *tkt = NULL;
+    if(line[0] != '-') {
+        tkt = (t_ticket*) malloc(sizeof(t_ticket));
+        fread(tkt, sizeof(t_ticket), 1, conn->input);
+    }
+    return tkt;
+}
+
 t_user *
 user_info(conn_t *conn) {
     request_t *rqst = new_request(P_USER_INFO, 1);
@@ -121,4 +137,29 @@ update_user(char *passwd, char *card, char *phone, conn_t *conn) {
 int 
 refund(char *id, conn_t *conn) {
     return simple_query(conn, P_REFUND, 2, id);
+}
+
+int 
+update_tkt(char *oldid,
+    char *id,
+    char *start,
+    char *end,
+    char *stime,
+    char *etime,
+    char *price,
+    char *distance,
+    char *num,
+    conn_t *conn
+    ) {
+    return simple_query(conn, P_TKT_UPDATE, 10,
+        oldid,
+        id,
+        start,
+        end,
+        stime,
+        etime,
+        price,
+        distance,
+        num
+        );
 }

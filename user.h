@@ -5,6 +5,7 @@ typedef struct {
     char password[40];
     char card[40];
     char phone[15];
+    int  type;
 } t_user;
 
 t_user* find_user_by_id(const char* id);

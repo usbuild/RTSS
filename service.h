@@ -6,10 +6,13 @@ typedef struct {
     char password[40];
     char card[40];
     char phone[15];
+    int  type;
 } t_user;
 
 typedef struct {
     char    id[10];
+    int     start_id;
+    int     end_id;
     char    start[15];
     char    end[15];
     char  stime[20];
@@ -36,4 +39,20 @@ t_ticket_list * query_ticket(char *site1, char *site2, conn_t *conn);
 
 int update_user(char *passwd, char *card, char *phone, conn_t *conn);
 t_ticket_list  *query_buy_ticket(conn_t *conn);
+t_ticket *load_ticket(char *, conn_t *);
+
+
+int 
+update_tkt(char *oldid,
+    char *id,
+    char *start,
+    char *end,
+    char *stime,
+    char *etime,
+    char *price,
+    char *distance,
+    char *num,
+    conn_t *conn
+    );
+
 #endif

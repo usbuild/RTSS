@@ -33,13 +33,15 @@ clean_tmp_tickets() {
 static void
 convert_to_t_ticket(char **argv, t_ticket *tkt) {
     strcpy(tkt->id, argv[0]);
-    strcpy(tkt->start, argv[1]);
-    strcpy(tkt->end, argv[2]);
+    tkt->start_id = atoi(argv[1]);
+    tkt->end_id = atoi(argv[2]);
     strcpy(tkt->stime, argv[3]);
     strcpy(tkt->etime, argv[4]);
     tkt->price = strtod(argv[5], NULL);
     tkt->distance = atoi(argv[6]);
     tkt->num = atoi(argv[7]);
+    strcpy(tkt->start, argv[8]);
+    strcpy(tkt->end, argv[9]);
 }
 
 static int
@@ -67,7 +69,9 @@ t_ticket_list *
 search_tickets(const char *s, const char *e) {
     char sql[SQL_LEN];    
     sprintf(sql, 
-        "SELECT * FROM ticket WHERE start like '%%%s%%' and end like '%%%s%%'",
+        "SELECT t.*, s1.name, s2.name  FROM ticket t " \
+        "LEFT JOIN station s1 ON s1.id = t.start_id LEFT JOIN station s2 ON s2.id = t.end_id" \
+        " WHERE s1.name LIKE '%%%s%%' and s2.name LIKE '%%%s%%' ",
         s, e);
     clean_tmp_tickets();
     exec_query(sql, list_callback);
@@ -79,8 +83,10 @@ t_ticket_list *
 find_tickets_by_user_id(const char *user_id) {
     char sql[SQL_LEN];
     sprintf(sql,
-        " SELECT ticket.* FROM user_ticket LEFT JOIN user ON user.id = '%s' AND user_ticket.user_id = user.id "\
-        "LEFT JOIN ticket ON user_ticket.ticket_id = ticket.id" ,
+        "SELECT t.*, s1.name, s2.name FROM user_ticket ut "\
+        "LEFT JOIN ticket t ON ut.ticket_id = t.id " \
+        "LEFT JOIN station s1 ON s1.id = t.start_id LEFT JOIN station s2 ON s2.id = t.end_id " \
+        "WHERE ut.user_id = '%s' ",
         user_id);
 
     clean_tmp_tickets();
@@ -92,7 +98,9 @@ int
 has_user_bought(const char *id, const char *ticket_id) {
     char sql[SQL_LEN];
     sprintf(sql, 
-        "SELECT t.* FROM user_ticket ut, ticket t where ut.ticket_id = '%s' and ut.user_id = '%s' and ut.ticket_id = t.id",
+        "SELECT t.*,s1.name, s2.name FROM user_ticket ut, ticket t "\
+        "LEFT JOIN station s1 ON s1.id = t.start_id LEFT JOIN station s2 ON s2.id = t.end_id " \
+        "where ut.ticket_id = '%s' and ut.user_id = '%s' and ut.ticket_id = t.id",
         ticket_id, id);
     clean_tmp_ticket();
     exec_query(sql, callback);
@@ -126,7 +134,9 @@ t_ticket *
 find_ticket_by_id(const char *id) {
     char sql[SQL_LEN];
     sprintf(sql,
-        "SELECT * FROM ticket WHERE id='%s'",
+        "SELECT t.*, s1.name, s2.name FROM ticket t "\
+        "LEFT JOIN station s1 ON s1.id = t.start_id LEFT JOIN station s2 ON s2.id = t.end_id " \
+        "WHERE t.id='%s' ",
         id);
     clean_tmp_ticket();
     exec_query(sql, callback);
@@ -137,11 +147,11 @@ int
 insert_ticket(t_ticket *tkt) {
     char sql[256];
     sprintf(sql, 
-        "INSERT INTO ticket(`id`, `start`, `end`, `stime`, `etime`, `price`, `distance`, `num`)" \
-        " VALUES('%s', '%s', '%s', '%s', '%s', '%lf', '%d', '%d')",
+        "INSERT INTO ticket(`id`, `start_id`, `end_id`, `stime`, `etime`, `price`, `distance`, `num`)" \
+        " VALUES('%s', '%d', '%d', '%s', '%s', '%lf', '%d', '%d')",
         tkt->id,
-        tkt->start,
-        tkt->end,
+        tkt->start_id,
+        tkt->end_id,
         tkt->stime,
         tkt->etime,
         tkt->price,
@@ -156,10 +166,10 @@ int
 update_ticket(const char *id, t_ticket *tkt) {
     char sql[SQL_LEN];
     sprintf(sql,
-        "UPDATE ticket SET id = '%s', start='%s', end='%s', stime='%s', etime='%s', price='%lf', distance='%d', num='%d' WHERE id='%s'",
+        "UPDATE ticket SET id = '%s', start_id='%d', end_id='%d', stime='%s', etime='%s', price='%lf', distance='%d', num='%d' WHERE id='%s'",
         tkt->id,
-        tkt->start,
-        tkt->end,
+        tkt->start_id,
+        tkt->end_id,
         tkt->stime,
         tkt->etime,
         tkt->price,

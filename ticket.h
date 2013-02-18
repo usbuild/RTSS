@@ -3,6 +3,8 @@
 #include <sys/types.h>
 typedef struct {
     char    id[10];
+    int     start_id;
+    int     end_id;
     char    start[15];
     char    end[15];
     char  stime[20];

@@ -93,6 +93,40 @@ query_buy(const char *id) {
     return find_tickets_by_user_id(id);
 }
 
+t_ticket *
+load_ticket(char *id) {
+    return find_ticket_by_id(id);
+}
+
+int add_update_ticket(
+    char *oldid,
+    char *id,
+    char *start,
+    char *end,
+    char *stime,
+    char *etime,
+    char *price,
+    char *distance,
+    char *num
+    ) {
+    t_ticket tkt;
+    strcpy(tkt.id, id);
+    tkt.start_id = atoi(start);
+    tkt.end_id = atoi(end);
+    strcpy(tkt.stime, stime);
+    strcpy(tkt.etime, etime);
+    tkt.price = atof(price);
+    tkt.distance = atoi(distance);
+    tkt.num = atoi(num);
+
+    if(find_ticket_by_id(oldid) == NULL) {
+        return insert_ticket(&tkt);
+    } else {
+        return update_ticket(oldid, &tkt);
+    }
+
+}
+
 
 void simple_response(int status, conn_t *conn) {
     char *ok = "+OK"CRLF;
@@ -124,7 +158,7 @@ void handle_client(conn_t *conn) {
                     simple_response(1, conn);
                 }
             } 
-            else  if(conn->user != NULL) {
+            else  if(conn->user != NULL) { //authorized user
                 if(IS_PROTOCOL(rqst, P_BUY)) {
                     if(buy(conn->user->id, rqst->argv[1]) == 0)  {
                         simple_response(0, conn);
@@ -193,8 +227,37 @@ void handle_client(conn_t *conn) {
                         simple_response(1, conn);
                     }
                 }
-
-            } else {
+                else if(IS_PROTOCOL(rqst, P_TICKET) && conn->user->type == 1) {
+                    t_ticket *tkt = load_ticket(rqst->argv[1]);
+                    if(tkt == NULL) {
+                        simple_response(1, conn);
+                    } else {
+                        char *tmp = ltoa(sizeof(t_ticket));
+                        write(conn->dfd, "?", 1); write(conn->dfd, tmp, strlen(tmp));write(conn->dfd, CRLF, CLLEN);
+                        write(conn->dfd, tkt, sizeof(t_ticket));
+                        free(tmp);
+                    }
+                } else if(IS_PROTOCOL(rqst, P_TKT_UPDATE) && conn->user->type == 1) {
+                    if(add_update_ticket(rqst->argv[1],
+                            rqst->argv[2],
+                            rqst->argv[3],
+                            rqst->argv[4],
+                            rqst->argv[5],
+                            rqst->argv[6],
+                            rqst->argv[7],
+                            rqst->argv[8],
+                            rqst->argv[9]
+                            ) == 0) {
+                        simple_response(0, conn);
+                    } else {
+                        simple_response(1, conn);
+                    }
+                }
+            } 
+            else if(IS_PROTOCOL(rqst, P_EXIT)) {
+                return;
+            }
+            else {
                 simple_response(1, conn);
             }
         }
