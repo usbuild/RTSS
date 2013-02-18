@@ -140,7 +140,7 @@ refund(char *id, conn_t *conn) {
 }
 
 int 
-update_tkt(char *oldid,
+update_tkt(char *oldid,/*{{{*/
     char *id,
     char *start,
     char *end,
@@ -162,4 +162,29 @@ update_tkt(char *oldid,
         distance,
         num
         );
+}/*}}}*/
+int del_station(char *id, conn_t *conn) {
+    return simple_query(conn, P_STN_DEL, 2, id);
+}
+int add_station(char *name, conn_t *conn) {
+    return simple_query(conn, P_STN_ADD, 2, name);
+}
+t_station_list * all_station(conn_t *conn) {
+    request_t *rqst = new_request(P_STN_ALL, 1);
+    send_data(conn, rqst);
+    del_request(rqst);
+
+    char line[LINE_BUF] = {0};
+    fgets(line, LINE_BUF, conn->input);
+    t_station_list *list = (t_station_list*) malloc(sizeof(t_station_list));
+
+    line[strlen(line) - 2] = 0;
+    list->num = atoi(line + 1);
+    list->data = (t_station *) calloc(list->num, sizeof(t_station));
+    int i;
+    for (i = 0; i < list->num; ++i) {
+        fgets(line, LINE_BUF, conn->input);
+        fread(&list->data[i], sizeof(t_station), 1, conn->input);
+    }
+    return list;
 }

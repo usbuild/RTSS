@@ -49,6 +49,7 @@ GtkEntry *et_tkt_price;
 GtkEntry *et_tkt_num;
 GtkTreeView *station_table;
 GtkListStore *station_store;
+GtkEntry *et_stn_name;
 
 void get_widgets(GtkBuilder* gb)
 {
@@ -83,6 +84,7 @@ void get_widgets(GtkBuilder* gb)
     W_G(ENTRY, et_tkt_num);
     W_G(TREE_VIEW, station_table);
     W_G(LIST_STORE, station_store);
+    W_G(ENTRY, et_stn_name);
 }
 
 static void
@@ -176,6 +178,22 @@ N_CALLBACK(on_login_win_show) {
     conn = connect_server();    
 }
 
+void reload_station_table() {
+    t_station_list *list = all_station(conn);
+    GtkTreeIter iter;
+    gtk_list_store_clear(station_store);
+    int i;
+    for (i = 0; i < list->num; i++) {
+        gtk_list_store_append(station_store, &iter);
+        gtk_list_store_set(station_store, &iter,
+            0, list->data[i].id,
+            1, list->data[i].name,
+            -1);
+    }
+    gtk_tree_view_set_model(GTK_TREE_VIEW(station_table), GTK_TREE_MODEL(station_store));
+
+}
+
 N_CALLBACK(on_admin_win_show) {
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
@@ -185,6 +203,7 @@ N_CALLBACK(on_admin_win_show) {
 
     column = gtk_tree_view_column_new_with_attributes("name", renderer, "text", 1, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(station_table), column);
+    reload_station_table();
 }
 
 
@@ -345,6 +364,33 @@ void on_ticket_table_row_activated( GtkTreeView *treeview,
     }
 }
 
+void on_station_table_row_activated( GtkTreeView *treeview,
+                                    GtkTreePath *path,
+                                    GtkTreeViewColumn *col,
+                                    gpointer userdata) {
+    GtkTreeIter iter;
+    GtkTreeModel *model = gtk_tree_view_get_model(treeview);
+    int id;
+    if(gtk_tree_model_get_iter(model, &iter, path)) {
+        gtk_tree_model_get(model, &iter, 0, &id, -1);
+        GtkMessageDialog *dialog;
+        if(del_station(ltoa(id), conn) == 0) {
+            reload_station_table();
+            dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                    login_win,GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_CLOSE,"Delete station successfully"
+                    ));
+        } else {
+            dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                    login_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Delete station Failed"
+                    ));
+            
+        }
+            gtk_dialog_run(GTK_DIALOG(dialog));
+            gtk_widget_destroy(GTK_WIDGET(dialog));
+    }
+}
+
+
 void on_buy_ticket_table_row_activated( GtkTreeView *treeview,/*{{{*/
                                     GtkTreePath *path,
                                     GtkTreeViewColumn *col,
@@ -434,6 +480,19 @@ N_CALLBACK(on_save_tkt_btn_clicked) {
     }
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
+N_CALLBACK(on_add_st_btn_clicked) {
+    char * name = (char*) gtk_entry_get_text(et_stn_name);
+    if(add_station(name, conn) == 0) {
+        reload_station_table();
+    } else {
+        GtkMessageDialog *dialog = GTK_MESSAGE_DIALOG(gtk_message_dialog_new(
+                admin_win,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Save Failed"
+                ));
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+    }
 }
 
 GtkBuilder* gtk_load_glade(gchar* filename) {/*{{{*/

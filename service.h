@@ -27,6 +27,16 @@ typedef struct {
     int num;
 } t_ticket_list;
 
+typedef struct {
+    int id;
+    char name[20];
+} t_station;
+
+typedef struct {
+    t_station *data;
+    int num;
+} t_station_list;
+
 int login(char *username, char *password, conn_t *conn);
 
 int signup(char *username, char *password, conn_t *conn);
@@ -55,4 +65,7 @@ update_tkt(char *oldid,
     conn_t *conn
     );
 
+int del_station(char *id, conn_t *conn);
+int add_station(char *name, conn_t *conn);
+t_station_list * all_station(conn_t *conn);
 #endif

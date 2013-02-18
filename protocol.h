@@ -13,5 +13,10 @@
 #define P_DEL_TICKET    "del_ticket"
 #define P_TICKET        "load_ticket"
 #define P_TKT_UPDATE    "update_ticket"
+
+#define P_STN_ADD       "add_station"
+#define P_STN_DEL       "del_station"
+#define P_STN_ALL       "all_station"
+
 #define P_EXIT          "exit"
 #endif
