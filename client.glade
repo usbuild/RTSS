@@ -375,6 +375,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="model">station_store</property>
+                    <signal name="row-activated" handler="on_station_table_row_activated" swapped="no"/>
                     <child internal-child="selection">
                       <object class="GtkTreeSelection" id="treeview-selection3"/>
                     </child>
@@ -395,7 +396,7 @@
                 <property name="margin_bottom">20</property>
                 <property name="layout_style">spread</property>
                 <child>
-                  <object class="GtkEntry" id="entry1">
+                  <object class="GtkEntry" id="et_stn_name">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
@@ -412,6 +413,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_add_st_btn_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>

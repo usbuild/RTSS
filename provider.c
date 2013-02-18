@@ -4,6 +4,7 @@
 #include <rpc_fifo_server.h>
 #include <ticket.h>
 #include <user.h>
+#include <station.h>
 #include <stdlib.h>
 #include <dbutils.h>
 #define IS_PROTOCOL(A,B) (strcmp(A->argv[0], B) == 0)
@@ -96,6 +97,21 @@ query_buy(const char *id) {
 t_ticket *
 load_ticket(char *id) {
     return find_ticket_by_id(id);
+}
+
+t_station_list *
+all_station() {
+    return list_station();
+}
+
+int 
+del_station(char *id) {
+    return remove_station(atoi(id));
+}
+
+int add_station(char *name) {
+    if(strlen(name) == 0) return 1;
+    return insert_station(name);
 }
 
 int add_update_ticket(
@@ -252,6 +268,40 @@ void handle_client(conn_t *conn) {
                     } else {
                         simple_response(1, conn);
                     }
+                } else if(IS_PROTOCOL(rqst, P_STN_ADD) && conn->user->type == 1) {
+                    if(add_station(rqst->argv[1]) == 0)  {
+                        simple_response(0, conn);
+                    } else {
+                        simple_response(1, conn);
+                    }
+
+                } else if(IS_PROTOCOL(rqst, P_STN_DEL) && conn->user->type == 1) {
+                    if(del_station(rqst->argv[1]) == 0)  {
+                        simple_response(0, conn);
+                    } else {
+                        simple_response(1, conn);
+                    }
+
+                } else if(IS_PROTOCOL(rqst, P_STN_ALL) && conn->user->type == 1) {
+                    t_station_list *list = all_station();
+
+                    write(conn->dfd, "*", 1);
+                    char *tmp = ltoa(list->num);
+                    int tmplen = strlen(tmp);
+                    write(conn->dfd, tmp, tmplen);
+                    write(conn->dfd, CRLF, CLLEN);
+
+                    free(tmp);
+
+                    tmp = ltoa(sizeof(t_station));
+                    tmplen = strlen(tmp);
+                    int i;
+                    for (i = 0; i < list->num; ++i) {
+                        write(conn->dfd, "?", 1); write(conn->dfd, tmp, tmplen); write(conn->dfd, CRLF, CLLEN);
+                        write(conn->dfd, &list->data[i], sizeof(t_station));
+                    }
+                    free(tmp);
+
                 }
             } 
             else if(IS_PROTOCOL(rqst, P_EXIT)) {

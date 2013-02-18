@@ -51,7 +51,7 @@ list_callback(void *nouse, int argc, char **argv, char **col_name) {
         tmp_tickets->data = (t_ticket*) calloc(sizeof(t_ticket), tmp_tickets->total);
     }
     if(tmp_tickets->num >= tmp_tickets->total) {
-        tmp_tickets->total = 1.5 * tmp_tickets->num;
+        tmp_tickets->total *= 1.5;
         tmp_tickets->data = (t_ticket*) realloc(tmp_tickets->data, tmp_tickets->total);
     }
     convert_to_t_ticket(argv, &tmp_tickets->data[tmp_tickets->num++]);
