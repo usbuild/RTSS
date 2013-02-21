@@ -188,3 +188,8 @@ t_station_list * all_station(conn_t *conn) {
     }
     return list;
 }
+
+void client_exit(conn_t *conn) {
+    simple_query(conn, P_EXIT, 1);
+    release_connection(conn);
+}

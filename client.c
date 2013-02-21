@@ -164,14 +164,20 @@ N_CALLBACK(on_signup_btn_clicked) {
 
 }
 
-N_CALLBACK(on_login_win_destroy) {
+static void 
+client_quit() {
+    client_exit(conn);
     gtk_main_quit();
+}
+N_CALLBACK(on_login_win_destroy) {
+    client_quit();
 }
 
 N_CALLBACK(on_main_win_destroy) {
-    gtk_main_quit();
-} N_CALLBACK(on_admin_win_destroy) {
-    gtk_main_quit();
+    client_quit();
+} 
+N_CALLBACK(on_admin_win_destroy) {
+    client_quit();
 }
 
 N_CALLBACK(on_login_win_show) {

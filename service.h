@@ -68,4 +68,5 @@ update_tkt(char *oldid,
 int del_station(char *id, conn_t *conn);
 int add_station(char *name, conn_t *conn);
 t_station_list * all_station(conn_t *conn);
+void client_exit(conn_t *conn);
 #endif

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <provider.h>
 #include <unistd.h>
@@ -13,6 +14,8 @@
 
 int main(int argc, const char *argv[])
 {
+
+    signal(SIGCHLD, SIG_IGN);
     db_init();
     FILE *f = server_init(SERVER_FIFO);
     pid_t ppid = getpid();

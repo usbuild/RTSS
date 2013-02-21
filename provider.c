@@ -174,6 +174,10 @@ void handle_client(conn_t *conn) {
                     simple_response(1, conn);
                 }
             } 
+            else if(IS_PROTOCOL(rqst, P_EXIT)) {
+                simple_response(0, conn);
+                return;
+            }
             else  if(conn->user != NULL) { //authorized user
                 if(IS_PROTOCOL(rqst, P_BUY)) {
                     if(buy(conn->user->id, rqst->argv[1]) == 0)  {
@@ -304,9 +308,6 @@ void handle_client(conn_t *conn) {
 
                 }
             } 
-            else if(IS_PROTOCOL(rqst, P_EXIT)) {
-                return;
-            }
             else {
                 simple_response(1, conn);
             }
