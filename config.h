@@ -4,6 +4,7 @@
 #define DB_NAME "rtss.db"
 #define SQL_LEN 256
 #define ARG_LEN 128
+#define LOG_FILE "/tmp/rtss.log"
 
 #define CRLF "\r\n"
 #define CLLEN 2

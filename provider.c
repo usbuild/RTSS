@@ -7,6 +7,7 @@
 #include <station.h>
 #include <stdlib.h>
 #include <dbutils.h>
+#include <log.h>
 #define IS_PROTOCOL(A,B) (strcmp(A->argv[0], B) == 0)
 
 
@@ -45,6 +46,7 @@ int buy(char *username, char *ticketid) {
         return 1;
     }
     tx_commit();
+    rtss_log("%s buy %s", username, ticketid);
     return 0;
 }
 
@@ -76,6 +78,7 @@ int refund(char *username, char *ticketid) {
         return 1;
     }
     tx_commit();
+    rtss_log("%s refund %s", username, ticketid);
     return 0;
 }
 
