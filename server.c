@@ -17,9 +17,14 @@ int main(int argc, const char *argv[])
 
     signal(SIGCHLD, SIG_IGN);
     db_init();
+#ifdef LOCAL_VERSION
     FILE *f = server_init(SERVER_FIFO);
-    pid_t ppid = getpid();
+#endif
+#ifdef REMOTE_VERSION
+    int f = server_init();
+#endif
     conn_t *client_conn = NULL;
+    pid_t ppid = getpid();
     while(getpid() == ppid) {
         if(client_conn != NULL) release_conn(client_conn);
         client_conn = get_connection(f);

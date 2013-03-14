@@ -12,6 +12,12 @@ typedef struct {
     char *dpath;
 } conn_t;
 #endif
+#ifdef REMOTE_VERSION
+typedef struct {
+    int cfd;        //control fd
+    FILE *input;
+} conn_t;
+#endif
 
 #ifdef LOCAL_VERSION
 

@@ -9,6 +9,14 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
+
+#ifdef REMOTE_VERSION
+#include <strings.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#endif
+
 #define BUF_LEN 1024
 
 extern int errno;
@@ -31,6 +39,7 @@ char *build_request_str(request_t *rqst) {
     puts(str);
     return str;
 }
+#ifdef LOCAL_VERSION
 conn_t *connect_server() {
     pid_t pid = getpid();
     request_t rqst;
@@ -76,14 +85,37 @@ conn_t *connect_server() {
     ct->input = fopen(ct->dpath, "r");
     return ct;
 }
+#endif
+
+#ifdef REMOTE_VERSION
+conn_t *connect_server() {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    int res;
+    struct hostent *server = gethostbyname("localhost");
+    if(server == NULL) {perror("gethost Error");exit(1);}
+    struct sockaddr_in serv_addr;
+    bzero((char *)&serv_addr, sizeof(serv_addr));
+    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+    res = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    if(res < 0) {perror("Connect Error");exit(1);}
+    conn_t *conn = (conn_t *) malloc(sizeof(conn_t));
+    conn->cfd = fd;
+    conn->input = fdopen(fd, "r");
+    return conn;
+}
+#endif
 
 
 void
 release_connection(conn_t *conn) {
     close(conn->cfd);
     fclose(conn->input);
+#ifdef LOCAL_VERSION
     unlink(conn->cpath);
     unlink(conn->dpath);
+#endif
 }
 void send_data(conn_t *conn, request_t *request) {
     char *str = build_request_str(request);

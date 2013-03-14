@@ -5,20 +5,23 @@
 #include <utils.h>
 #include <user.h>
 
-#ifdef LOCAL_VERSION
 typedef struct {
     FILE *input;
     int dfd;        //data fd
     t_user *user;
 } conn_t;
-#endif
 
 #ifdef LOCAL_VERSION
 FILE *server_init(const char *path);
+conn_t *get_connection(FILE *f);
+#endif
+
+#ifdef REMOTE_VERSION
+int server_init();
+conn_t *get_connection(int fd);
 #endif
 
 
-conn_t *get_connection(FILE *f);
 void send_data(conn_t *conn, void *data, long length);
 void receive_data(conn_t *conn);
 void release_conn(conn_t *c);
