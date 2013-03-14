@@ -1,6 +1,6 @@
 #ifndef __SERVICE_H__
 #define __SERVICE_H__
-#include <rpc_fifo_client.h>
+#include <rpc_client.h>
 typedef struct {
     char id[15];
     char password[40];

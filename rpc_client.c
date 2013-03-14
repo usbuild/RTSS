@@ -1,4 +1,4 @@
-#include <rpc_fifo_client.h>
+#include <rpc_client.h>
 #include <config.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -5,6 +5,7 @@
 #define SQL_LEN 256
 #define ARG_LEN 128
 #define LOG_FILE "/tmp/rtss.log"
+
 #define PORT 4327
 #define IP "127.0.0.1"
 

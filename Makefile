@@ -16,11 +16,11 @@ client: CFLAGS += $(GTK_INC)
 client: LIBS += $(GTK_LIBS)
 server: CFLAGS += $(SQLITE_INC)
 server: LIBS += $(SQLITE_LIBS)
-client:client.c rpc_fifo_client.c utils.c service.c
+client:client.c rpc_client.c utils.c service.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
-server:server.c dbutils.c user.c ticket.c utils.c rpc_fifo_server.c provider.c station.c log.c
+server:server.c dbutils.c user.c ticket.c utils.c rpc_server.c provider.c station.c log.c
 	$(CC) $^ $(CFLAGS) -o $@  $(LIBS)
 
 clean:
-	-rm client server core
+	-rm client server

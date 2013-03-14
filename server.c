@@ -10,7 +10,7 @@
 #include <user.h>
 #include <ticket.h>
 #include <config.h>
-#include <rpc_fifo_server.h>
+#include <rpc_server.h>
 
 int main(int argc, const char *argv[])
 {

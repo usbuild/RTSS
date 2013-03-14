@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <utils.h>
-#include <rpc_fifo_server.h>
+#include <rpc_server.h>
 #include <protocol.h>
 #ifdef REMOTE_VERSION
 #include <sys/socket.h>

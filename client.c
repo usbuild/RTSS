@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include <config.h>
 #include <service.h>
-#include <rpc_fifo_client.h>
+#include <rpc_client.h>
 
 #define W_G(type,name) name=GTK_##type(gtk_builder_get_object(gb,#name))
 #define N_CALLBACK(event_name) void event_name(GtkWidget *widget, gpointer user_data)

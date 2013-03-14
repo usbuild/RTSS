@@ -1,5 +1,5 @@
 #ifndef __SERVICE_H__
 #define __SERVICE_H__
-#include <rpc_fifo_server.h>
+#include <rpc_server.h>
 void handle_client(conn_t *conn);
 #endif

@@ -3,7 +3,7 @@
 #include <malloc.h>
 #include <protocol.h>
 #include <utils.h>
-#include <rpc_fifo_client.h>
+#include <rpc_client.h>
 #include <stdarg.h>
 #define LINE_BUF 1024
 request_t * new_request(char *protocol, int argc) {

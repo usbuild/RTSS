@@ -1,7 +1,7 @@
 #include <provider.h>
 #include <string.h>
 #include <protocol.h>
-#include <rpc_fifo_server.h>
+#include <rpc_server.h>
 #include <ticket.h>
 #include <user.h>
 #include <station.h>
